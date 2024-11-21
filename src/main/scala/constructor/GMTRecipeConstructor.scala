@@ -4,10 +4,12 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.stream.Materializer
+
 import scala.concurrent.Future
 import service.RecipeService
 import service.RecipeJsonProtocol._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import service.RecipeService.getRecipeById
 
 
 object GMTRecipeConstructor {
@@ -30,8 +32,25 @@ object GMTRecipeConstructor {
               case None => complete(s"Recipe with ID $id not found")
             }
           }
-        }
-    }
+        }~
+        delete {
+          complete {
+            RecipeService.deleteRecipe(id).map {
+              case 1 => s"Recipe with ID $id deleted successfully"
+              case _ => s"Recipe with ID $id not found"
+            }
+          }
+        } ~
+        put {
+          entity(as[Recipe]) { updatedRecipe =>
+            complete {
+              RecipeService.updateRecipe(id, updatedRecipe).map {
+                case 1 => s"Recipe with ID $id updated successfully"
+                case _ => s"Recipe with ID $id not found"
+              }
+            }
+          }
+
 
   def startServer(): Future[Http.ServerBinding] = {
     Http().newServerAt("localhost", 8080).bind(route)
@@ -47,4 +66,5 @@ object GMTRecipeConstructor {
     }
   }
 }
+
 
