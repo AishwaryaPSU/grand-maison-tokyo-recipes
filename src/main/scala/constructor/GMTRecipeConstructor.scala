@@ -22,7 +22,15 @@ object GMTRecipeConstructor {
         get {
           complete(RecipeService.getAllRecipes)
         }
-      }
+      } ~
+        path(IntNumber) { id =>
+          get {
+            getRecipeById(id) match {
+              case Some(recipe) => complete(recipe)
+              case None => complete(s"Recipe with ID $id not found")
+            }
+          }
+        }
     }
 
   def startServer(): Future[Http.ServerBinding] = {

@@ -2,37 +2,21 @@ package service
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import model.Recipe
+import repository.RecipeRepository
 import spray.json.DefaultJsonProtocol
+import spray.json.DefaultJsonProtocol.jsonFormat6
 
-
-object RecipeJsonProtocol extends DefaultJsonProtocol {
-  implicit val recipeFormat = jsonFormat6(Recipe)
-}
+import scala.concurrent.Future
 
 object RecipeService extends SprayJsonSupport {
-  import RecipeJsonProtocol._
 
-  // Static list of recipes
-  private val recipes = List(
-    Recipe(
-      id = 1,
-      title = "Pancakes",
-      makingTime = "20 minutes",
-      cost = "5",
-      serves = "2 people",
-      ingredients = List("Flour", "Eggs", "Milk", "Sugar", "Butter")
-    ),
-    Recipe(
-      id = 2,
-      title = "Spaghetti Bolognese",
-      makingTime = "40 minutes",
-      cost = "10",
-      serves = "4 people",
-      ingredients = List("Spaghetti", "Tomato Sauce", "Minced Meat", "Onions", "Garlic")
-    )
-  )
+  def getAllRecipes: Future[List[Recipe]] = {
+    RecipeRepository.getAllRecipes
+  }
 
-  // Function to retrieve all recipes
-  def getAllRecipes: List[Recipe] = recipes
+  def getRecipeById(id: Int): Future[Option[Recipe]] = {
+    RecipeRepository.getRecipeById(id)
+  }
+
 }
 
